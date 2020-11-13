@@ -13,7 +13,7 @@ yarn install
 
 ### Scrape games
 
-To scrape games you have to pass (s)eason and (t)ype as arguments. Optional arguments for console (p)rint and for (w)riting to results to file.
+To scrape games you have to pass (s)eason and (t)ype as arguments. Optional arguments for console (p)rint, include (l)ineups and for (w)riting to results to file.
 
 ```
 node games-scraper.js -s 2019-2020 -t runkosarja -p -w games.json
