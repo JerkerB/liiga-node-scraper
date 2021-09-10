@@ -1,40 +1,67 @@
-'use strict';
+"use strict";
 
-const scrapeIt = require('scrape-it');
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-const playerData = {
-  name: {
-    selector: '.head',
-  },
-  players: {
-    listItem: '.player',
-    data: {
-      number: {
-        selector: '.jersey',
-        convert: (x) => x.substring(1),
-      },
-      name: {
-        selector: '.name',
-      },
-      position: {
-        closest: 'div',
-        attr: 'class',
-        convert: (x) => x.charAt(0),
-      },
-    },
-  },
-};
+function getPlayer(line, role, position) {
+  const player = line.find((player) => player.role === role);
+  return player
+    ? {
+        number: player.jersey,
+        name: `${player.lastName}, ${player.firstName}`,
+        position,
+      }
+    : undefined;
+}
 
-const scrapeLineups = (season, matchId) =>
-  scrapeIt(`https://liiga.fi/fi/ottelut/${season}/runkosarja/${matchId}/kokoonpanot/`, {
-    home: {
-      listItem: '.rosters .team.home .line',
-      data: playerData,
-    },
-    away: {
-      listItem: '.rosters .team.away .line',
-      data: playerData,
-    },
-  });
+function getGoalies(data) {
+  const goalies = data
+    .filter((player) => player.role === "GOALIE")
+    .sort((a, b) => a.line - b.line);
+  return {
+    name: "Maalivahdit",
+    players: goalies
+      .sort((a, b) => a.line - b.line)
+      .map((goalie) => ({
+        number: goalie.jersey,
+        name: `${goalie.lastName}, ${goalie.firstName}`,
+        position: "g",
+      })),
+  };
+}
 
-module.exports = scrapeLineups;
+function getLine(data, lineNumber) {
+  const line = data.filter(
+    (player) => player.line === lineNumber && player.role !== "GOALIE"
+  );
+  return {
+    name: `${lineNumber}. Kenttä`,
+    players: [
+      getPlayer(line, "LEFT_WING", "f"),
+      getPlayer(line, "CENTER", "f"),
+      getPlayer(line, "RIGHT_WING", "f"),
+      getPlayer(line, "LEFT_DEFENSEMAN", "d"),
+      getPlayer(line, "RIGHT_DEFENSEMAN", "d"),
+    ].filter((item) => item !== undefined),
+  };
+}
+
+function getLineup(team) {
+  return [
+    getGoalies(team),
+    getLine(team, 1),
+    getLine(team, 2),
+    getLine(team, 3),
+    getLine(team, 4),
+  ];
+}
+
+const fetchLineups = (season, matchId) =>
+  fetch(`https://liiga.fi/api/v1/games/${season + 1}/${matchId}`)
+    .then((res) => res.json())
+    .then((json) => ({
+      home: json.homeTeamPlayers ? getLineup(json.homeTeamPlayers) : [],
+      away: json.awayTeamPlayers ? getLineup(json.homeTeamPlayers) : [],
+    }));
+
+module.exports = fetchLineups;
