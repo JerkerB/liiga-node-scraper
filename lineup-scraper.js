@@ -61,7 +61,7 @@ const fetchLineups = (season, matchId) =>
     .then((res) => res.json())
     .then((json) => ({
       home: json.homeTeamPlayers ? getLineup(json.homeTeamPlayers) : [],
-      away: json.awayTeamPlayers ? getLineup(json.homeTeamPlayers) : [],
+      away: json.awayTeamPlayers ? getLineup(json.awayTeamPlayers) : [],
     }));
 
 module.exports = fetchLineups;
