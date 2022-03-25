@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "node-fetch": "^3.0.0",
     "scrape-it": "^5.2.4"
   }
