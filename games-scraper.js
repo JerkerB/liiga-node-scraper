@@ -7,16 +7,17 @@ const fetchLineups = require('./lineup-scraper');
 
 const { s, t, w, p, l } = argv;
 
-fetch(`https://liiga.fi/api/v1/schedule/${s}/${t}`)
+fetch(`https://liiga.fi/api/v1/games?tournament=${t}&season=${s}`)
   .then(res => res.json())
   .then(json => {
+    console.log(json)
     return json.map((game) => ({
-      id: game.fiha_id,
-      date: game.date.replace(/-/g, ''),
-      home: game.home_team_abbreviation,
-      homeScore: game.home_goals,
-      away: game.away_team_abbreviation,
-      awayScore: game.away_goals,
+      id: game.id,
+      date: game.start.replace(/-/g, '').split('T')[0],
+      home: game.homeTeam.teamName,
+      homeScore: game.homeTeam.goals,
+      away: game.awayTeam.teamName,
+      awayScore: game.awayTeam.goals,
     }));
   })
   .then(async (gameData) => {
