@@ -10,7 +10,6 @@ const { s, t, w, p, l } = argv;
 fetch(`https://liiga.fi/api/v1/games?tournament=${t}&season=${s}`)
   .then(res => res.json())
   .then(json => {
-    console.log(json)
     return json.map((game) => ({
       id: game.id,
       date: game.start.replace(/-/g, '').split('T')[0],
