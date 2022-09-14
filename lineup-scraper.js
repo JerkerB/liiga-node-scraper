@@ -16,12 +16,11 @@ function getPlayer(line, role, position) {
 
 function getGoalies(data) {
   const goalies = data
-    .filter((player) => player.role === "GOALIE")
+    .filter((player) => player.role === "GOALIE" && player.line != null)
     .sort((a, b) => a.line - b.line);
   return {
     name: "Maalivahdit",
     players: goalies
-      .sort((a, b) => a.line - b.line)
       .map((goalie) => ({
         number: goalie.jersey,
         name: `${goalie.lastName}, ${goalie.firstName}`,
