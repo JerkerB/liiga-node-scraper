@@ -57,7 +57,7 @@ function getLineup(team) {
 }
 
 const fetchLineups = (season, matchId) =>
-  fetch(`https://liiga.fi/api/v1/games/${season + 1}/${matchId}`)
+  fetch(`https://liiga.fi/api/v1/games/${season}/${matchId}`)
     .then((res) => res.json())
     .then((json) => ({
       home: json.homeTeamPlayers ? getLineup(json.homeTeamPlayers) : [],
